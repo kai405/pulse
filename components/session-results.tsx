@@ -37,17 +37,17 @@ function EvidenceText({ text, marks }: { text: string; marks: readonly string[] 
 export function SessionResults({ result = SAMPLE_RESULT }: { result?: SessionResultView }) {
   const router = useRouter();
   const [selectedTime, setSelectedTime] = useState(0);
-  const [media, setMedia] = useState<{ url: string; kind: "audio" | "video" } | null>(null);
+  const [media, setMedia] = useState<{ url: string; kind: "audio" | "video" } | null>(result.localMedia ?? null);
   const [deleting, setDeleting] = useState<"media" | "session" | null>(null);
   const [dataMessage, setDataMessage] = useState("");
   const mediaRef = useRef<HTMLMediaElement>(null);
   const paceSegments = useMemo(() => [132, 138, 147, 151, 143, 139, 142, 145], []);
   useEffect(() => {
-    if (result.isSample) return;
+    if (result.isSample || result.isLocal) return;
     const controller = new AbortController();
     fetch(`/api/sessions/${result.id}/media`, { signal: controller.signal }).then(async (response) => response.ok ? response.json() as Promise<{ url: string; kind: "audio" | "video" }> : null).then((value) => { if (value) setMedia(value); }).catch(() => undefined);
     return () => controller.abort();
-  }, [result.id, result.isSample]);
+  }, [result.id, result.isLocal, result.isSample]);
   const seekTo = (time: number) => { setSelectedTime(time); if (mediaRef.current) { mediaRef.current.currentTime = time; void mediaRef.current.play(); } };
   const deleteData = async (kind: "media" | "session") => {
     setDeleting(kind); setDataMessage("");
@@ -60,9 +60,10 @@ export function SessionResults({ result = SAMPLE_RESULT }: { result?: SessionRes
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <Link href="/history" className="inline-flex min-h-10 items-center gap-2 rounded-lg text-sm font-[650] text-[var(--ink-soft)] hover:text-[var(--ink)]"><ArrowLeft className="size-4" /> History</Link>
-        <div className="flex items-center gap-2">{result.isSample && <Badge tone="accent">Labeled sample</Badge>}<Badge>Rubric {result.rubricVersion}</Badge>{!result.isSample && <Dialog.Root><Dialog.Trigger asChild><Button variant="ghost" size="sm" className="border border-[var(--line)] bg-white">Manage data</Button></Dialog.Trigger><Dialog.Portal><Dialog.Overlay className="fixed inset-0 z-50 bg-black/35 backdrop-blur-sm" /><Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(92vw,480px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[var(--line)] bg-white p-6 shadow-2xl"><Dialog.Title className="text-xl font-[740] tracking-[-0.04em]">Manage this session’s data</Dialog.Title><Dialog.Description className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">Delete only the recording and keep the transcript and feedback, or permanently delete the complete session.</Dialog.Description>{dataMessage && <p role="status" className="mt-4 rounded-xl bg-[var(--surface-muted)] p-3 text-xs leading-5">{dataMessage}</p>}<div className="mt-6 grid gap-2"><Button variant="secondary" onClick={() => void deleteData("media")} disabled={Boolean(deleting)}>{deleting === "media" ? <LoaderCircle className="size-4 animate-spin" /> : <Trash2 className="size-4" />} Delete recording only</Button><Button variant="danger" onClick={() => void deleteData("session")} disabled={Boolean(deleting)}>{deleting === "session" ? <LoaderCircle className="size-4 animate-spin" /> : <Trash2 className="size-4" />} Delete complete session</Button><Dialog.Close asChild><Button variant="ghost">Cancel</Button></Dialog.Close></div></Dialog.Content></Dialog.Portal></Dialog.Root>}</div>
+        <div className="flex items-center gap-2">{result.isSample && <Badge tone="accent">Labeled sample</Badge>}{result.isLocal && <Badge tone="success">Live on-device analysis</Badge>}<Badge>Rubric {result.rubricVersion}</Badge>{!result.isSample && !result.isLocal && <Dialog.Root><Dialog.Trigger asChild><Button variant="ghost" size="sm" className="border border-[var(--line)] bg-white">Manage data</Button></Dialog.Trigger><Dialog.Portal><Dialog.Overlay className="fixed inset-0 z-50 bg-black/35 backdrop-blur-sm" /><Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(92vw,480px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[var(--line)] bg-white p-6 shadow-2xl"><Dialog.Title className="text-xl font-[740] tracking-[-0.04em]">Manage this session’s data</Dialog.Title><Dialog.Description className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">Delete only the recording and keep the transcript and feedback, or permanently delete the complete session.</Dialog.Description>{dataMessage && <p role="status" className="mt-4 rounded-xl bg-[var(--surface-muted)] p-3 text-xs leading-5">{dataMessage}</p>}<div className="mt-6 grid gap-2"><Button variant="secondary" onClick={() => void deleteData("media")} disabled={Boolean(deleting)}>{deleting === "media" ? <LoaderCircle className="size-4 animate-spin" /> : <Trash2 className="size-4" />} Delete recording only</Button><Button variant="danger" onClick={() => void deleteData("session")} disabled={Boolean(deleting)}>{deleting === "session" ? <LoaderCircle className="size-4 animate-spin" /> : <Trash2 className="size-4" />} Delete complete session</Button><Dialog.Close asChild><Button variant="ghost">Cancel</Button></Dialog.Close></div></Dialog.Content></Dialog.Portal></Dialog.Root>}</div>
       </div>
       {result.isSample && <div className="rounded-2xl border border-[var(--accent-line)] bg-[var(--accent-soft)] px-4 py-3 text-xs leading-5 text-[var(--accent-dark)]"><strong>Sample analysis:</strong> This session demonstrates Pulse feedback and is not your recording or progress data.</div>}
+      {result.isLocal && <div className="rounded-2xl border border-[var(--success-line)] bg-[var(--success-soft)] px-4 py-3 text-xs leading-5 text-[var(--success-ink)]"><strong>Live analysis complete:</strong> Pulse scored the microphone and camera signals collected from this recording directly in your browser. The recording has not left this device.</div>}
       {!result.isSample && result.status === "partial" && <div className="rounded-2xl border border-[var(--warning)] bg-[var(--warning-soft)] px-4 py-3 text-xs leading-5 text-[var(--warning)]"><strong>Partial objective result:</strong> This score uses only reliable recorded audio and camera signals. Transcript, fluency, content, and semantic feedback are unavailable and are not estimated.</div>}
 
       <header className="mt-6 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">

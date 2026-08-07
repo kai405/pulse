@@ -8,6 +8,7 @@ import type { PracticeConfiguration } from "@/components/practice-setup";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { createFrame, chooseMimeType, describeMediaError } from "@/lib/media/recording";
 import { startVisionAnalyzer, type VisualSample } from "@/lib/media/vision-analyzer";
+import { createLocalSessionResult } from "@/lib/scoring/local-result";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { formatDuration } from "@/lib/utils";
 
@@ -213,7 +214,19 @@ export function RecordingStudio() {
     setPhase("uploading"); setUploadError("");
     try {
       const supabase = createSupabaseBrowserClient();
-      if (!supabase) { setUploadError("Persistent live analysis is not configured in this environment. Add Supabase and OpenAI credentials, or view the labeled sample."); setPhase("error"); return; }
+      if (!supabase) {
+        const mediaBlob = videoBlob ?? audioBlob;
+        const result = createLocalSessionResult({
+          config,
+          durationSeconds: elapsed,
+          audioSamples: audioSamplesRef.current,
+          visualSamples: visualSamplesRef.current,
+          localMedia: mediaBlob ? { url: URL.createObjectURL(mediaBlob), kind: videoBlob ? "video" : "audio" } : undefined,
+        });
+        sessionStorage.setItem("pulse-local-session-result", JSON.stringify(result));
+        router.push("/sessions/local");
+        return;
+      }
       const response = await fetch("/api/sessions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ config, durationSeconds: elapsed, audio: { mime: audioBlob.type, bytes: audioBlob.size }, video: videoBlob ? { mime: videoBlob.type, bytes: videoBlob.size } : null, frameTimestamps: frameSamplesRef.current.map((frame) => frame.timestampMs) }) });
       const data = (await response.json()) as { id?: string; error?: string; uploads?: { audio: { path: string; token: string }; video: { path: string; token: string } | null; frames: ({ timestampMs: number; path: string; token: string } | null)[] } };
       if (!response.ok || !data.id || !data.uploads) { setUploadError(data.error ?? "Pulse could not reserve private storage."); setPhase("error"); return; }

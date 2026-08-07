@@ -10,6 +10,8 @@ export type SessionResultView = {
   score: number | null;
   status: string;
   isSample?: boolean;
+  isLocal?: boolean;
+  localMedia?: { url: string; kind: "audio" | "video" };
   rubricVersion: string;
   previousScore: number;
   words: number;
