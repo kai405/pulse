@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "engineVersion": "3.2.0",
+  "generatedAt": "2026-08-06T02:51:13.380Z",
+  "selection": {
+    "agent": "codex",
+    "grammar": "consumer-service",
+    "grammarSource": "built-in:consumer-service",
+    "fallback": "consumer-service",
+    "adapter": "product-ui",
+    "domain": "education",
+    "page": "dashboard",
+    "recipe": "calm-consumer",
+    "recipeSelection": "calm-consumer",
+    "profile": "editorial"
+  },
+  "bundle": {
+    "path": ".styleseed/effective-rules.md",
+    "sha256": "1e0fac032f175cb4ec9013b0c193e597158d6e7b7306fa47acb9adad01a790fc",
+    "bytes": 14907
+  },
+  "sources": [
+    {
+      "id": "agent-execution",
+      "sha256": "dfe4b0a2de36209ca50a04b39e35c248ac13fb8b059428fdb68a484cffc190cb",
+      "bytes": 329
+    },
+    {
+      "id": "core",
+      "sha256": "041d55d2a32c8e3965efeb7c743e01fd2b90c64cf21811426d826d62409dcf12",
+      "bytes": 4435
+    },
+    {
+      "id": "grammar",
+      "sha256": "0dd9297448a47c0383e902627ff24a6cbf8fb32427243ce4eac684f4b101421c",
+      "bytes": 963
+    },
+    {
+      "id": "adapter",
+      "sha256": "7b5b5c34b0b235dca329e6384ccb94c66ee65a348bbe7142277ae7bbda3c13b0",
+      "bytes": 714
+    },
+    {
+      "id": "domain",
+      "sha256": "8192f7a04edd7ea2466685e4418cbbde7913f77bd7237f78ac4fcd11436bd8a4",
+      "bytes": 951
+    },
+    {
+      "id": "page",
+      "sha256": "dad3ba4be04cf4ce9cb7457fc0fe22dac9d45c70618650a667b08fd1fa72a42a",
+      "bytes": 785
+    },
+    {
+      "id": "recipe",
+      "sha256": "6aa52992150b131d09f8039cf5e24fab7ace9fa0a51c934ac874852927b265e8",
+      "bytes": 1181
+    },
+    {
+      "id": "profile",
+      "sha256": "8bef636824524b82d7690f302eca6b31ea0f9650a7aa4bc05d0d01312634e4e8",
+      "bytes": 321
+    },
+    {
+      "id": "lock",
+      "sha256": "f170fba0633773395880e51a27c914a500ba033832c11edb8edef5fa42cb4411",
+      "bytes": 953
+    },
+    {
+      "id": "craft",
+      "sha256": "9f8b9c38d3ec1dc6d476a149b7c3502b27c51cbb55bce397a696b44335a22d21",
+      "bytes": 3564
+    }
+  ]
+}

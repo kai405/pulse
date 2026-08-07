@@ -1,0 +1,1 @@
+export default function Loading() { return <main className="grid min-h-screen place-items-center" aria-label="Loading Pulse"><div className="flex items-center gap-2"><span className="size-2 animate-pulse rounded-full bg-[var(--accent)]" /><span className="text-sm font-[650] text-[var(--ink-soft)]">Loading Pulse…</span></div></main>; }

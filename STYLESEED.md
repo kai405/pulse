@@ -1,0 +1,22 @@
+# StyleSeed — Design Lock
+<!-- Selections persist here. This file cannot waive StyleSeed core invariants. -->
+- App domain: education
+- Surface: responsive-web-app
+- Surface adapter: product-ui
+- Page type: dashboard
+- Output grammar: consumer-service
+- Grammar path: built-in:engine/RULESETS.md
+- Grammar fallback: consumer-service
+- Reference confidence: n/a
+- Brand recipe: calm-consumer
+- Aesthetic profile: editorial
+- Skin: custom
+- Primary action: #E65F45
+- Font: Geist Sans + Geist Mono
+- Radius: soft
+- Elevation: tonal grouping + restrained shadow + selective hairline
+- Density: comfortable
+- Motion: restrained, state-led easing with reduced-motion parity
+- Imagery/data role: speaking evidence first; charts only when they support a practice decision
+- Signature move: a persistent evidence rail that turns the pulse waveform into a guide through prompt, recording, transcript, and next action
+- Locked: 2026-08-05
