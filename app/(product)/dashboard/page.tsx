@@ -20,10 +20,10 @@ export default async function DashboardPage() {
   const latestCompleted = sessions.find((session) => session.score !== null && ["completed", "partial"].includes(session.status));
   const latestResult = latestCompleted ? await getOwnedSessionResult(latestCompleted.id) : null;
   const insight = showingSamples ? SAMPLE_RESULT : latestResult;
-  const weakest = insight?.categories.filter((category) => category.confidence !== "Low").sort((a, b) => a.score - b.score)[0];
+  const weakest = insight?.categories.filter((category) => category.confidence !== "Low" && category.score !== null).sort((a, b) => (a.score ?? 0) - (b.score ?? 0))[0];
   const recommendation = insight?.recommendations[0];
   const habitMetrics = insight
-    ? [...insight.categories].filter((category) => category.confidence !== "Low").sort((a, b) => b.score - a.score).slice(0, 3)
+    ? [...insight.categories].filter((category) => category.confidence !== "Low" && category.score !== null).sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, 3)
     : [];
   return (
     <div>
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
           <p className="text-sm font-[700]">Habits at a glance</p>
           <div className="mt-5 space-y-5">
             {habitMetrics.map((metric, index) => (
-              <div key={metric.label}><div className="flex items-center justify-between text-xs"><span className="font-[650]">{metric.label}</span><span><strong>{metric.score}</strong> <span className={metric.delta >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}>{metric.delta >= 0 ? "+" : ""}{metric.delta}</span></span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--surface-muted)]"><div className={`h-full rounded-full ${index === 0 ? "bg-[var(--success)]" : index === 1 ? "bg-[var(--navy)]" : "bg-[var(--accent)]"}`} style={{ width: `${metric.score}%` }} /></div></div>
+              <div key={metric.label}><div className="flex items-center justify-between text-xs"><span className="font-[650]">{metric.label}</span><span><strong>{metric.score}</strong> {metric.delta !== null && <span className={metric.delta >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}>{metric.delta >= 0 ? "+" : ""}{metric.delta}</span>}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--surface-muted)]"><div className={`h-full rounded-full ${index === 0 ? "bg-[var(--success)]" : index === 1 ? "bg-[var(--navy)]" : "bg-[var(--accent)]"}`} style={{ width: `${metric.score ?? 0}%` }} /></div></div>
             ))}
             {!habitMetrics.length && <p className="text-sm leading-6 text-[var(--ink-soft)]">Complete analysis to populate comparable category evidence.</p>}
           </div>

@@ -47,8 +47,8 @@ export async function getOwnedSessionResult(id: string): Promise<SessionResultVi
   const categories = (Object.keys(CATEGORY_META) as (keyof typeof CATEGORY_META)[]).map((key) => ({
     key,
     label: CATEGORY_META[key].label,
-    score: Math.round(categoryScores[key] ?? 0),
-    delta: previousAnalysis ? Math.round((categoryScores[key] ?? 0) - (previousCategoryScores[key] ?? 0)) : 0,
+    score: typeof categoryScores[key] === "number" ? Math.round(categoryScores[key]) : null,
+    delta: previousAnalysis && typeof categoryScores[key] === "number" && typeof previousCategoryScores[key] === "number" ? Math.round(categoryScores[key] - previousCategoryScores[key]) : null,
     confidence: categoryConfidence(key),
     summary: dimensionSummary(key === "delivery" ? [] : key === "fluency" ? ["verbal_clarity", "sentence_flow"] : key === "content" ? ["organization", "clarity_of_ideas"] : key === "visual" ? ["camera_engagement", "purposeful_movement"] : ["confident_delivery"]) ?? CATEGORY_META[key].fallback,
   }));
@@ -73,9 +73,9 @@ export async function getOwnedSessionResult(id: string): Promise<SessionResultVi
     rubricVersion: analysis.rubric_version,
     previousScore: previousAnalysis?.overall_score ?? analysis.overall_score ?? 0,
     words: transcriptSegments.reduce((sum, item) => sum + item.text.split(/\s+/).filter(Boolean).length, 0),
-    wpm: Number(metric("pace")?.numeric_value ?? 0),
-    fillerRate: Number(metric("fillers")?.numeric_value ?? 0),
-    cameraEngagement: Number(metric("camera_engagement")?.score ?? 0),
+    wpm: metric("pace")?.numeric_value == null ? null : Number(metric("pace")?.numeric_value),
+    fillerRate: metric("fillers")?.numeric_value == null ? null : Number(metric("fillers")?.numeric_value),
+    cameraEngagement: metric("camera_engagement")?.score == null ? null : Number(metric("camera_engagement")?.score),
     strongest: humanize(analysis.strongest_dimension ?? "content"),
     priority: analysis.priority_improvement ?? "Review your evidence",
     summary: analysis.summary ?? "Your analysis is ready.",

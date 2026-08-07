@@ -9,6 +9,7 @@ import { buildScorecard, THRESHOLD_SNAPSHOT, type AudioSample, type VisualSample
 import type { MetricScore, WordTiming } from "@/lib/scoring/types";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { formatDuration } from "@/lib/utils";
+import { processObjectiveFallback } from "@/lib/processing/objective-fallback";
 
 type CaptureMetadata = { audioSamples?: AudioSample[]; visualSamples?: VisualSample[] };
 
@@ -17,7 +18,12 @@ export async function processSession(sessionId: string, userId: string) {
   const env = getServerEnv();
   if (!admin) throw new Error("SUPABASE_NOT_CONFIGURED");
   if (!env.OPENAI_API_KEY) {
-    await failSession(sessionId, "provider_configuration", "Live analysis requires an OpenAI API key.");
+    try {
+      await processObjectiveFallback(sessionId, userId);
+    } catch (error) {
+      await failSession(sessionId, "processing_failed", safeProcessingMessage(error));
+      throw error;
+    }
     return;
   }
   try {
