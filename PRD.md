@@ -33,3 +33,5 @@ In a three-minute live demo, a judge can enter as a guest, choose an impromptu p
 ## Tech stack
 
 Next.js 16, React 19, strict TypeScript, Tailwind CSS, Supabase Auth/Postgres/private Storage, Inngest, OpenAI, MediaPipe/Web Audio, and Vercel.
+
+This was submitted before 6:30 P.M on August 6 and rocks!
